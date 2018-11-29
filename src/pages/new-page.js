@@ -10,12 +10,11 @@ class NewPage extends React.Component {
     return (
       <div>
         <Helmet>
-            <title>{siteTitle}</title>
-            <meta name="description" content={siteDescription} />
+          <title>{siteTitle}</title>
+          <meta name="description" content={siteDescription} />
         </Helmet>
 
         <h1>This is a new page</h1>
-
       </div>
     )
   }
