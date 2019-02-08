@@ -2,11 +2,20 @@ import React, { Component } from 'react'
 import Helmet from 'react-helmet'
 
 import stars from '../images/stars-in-the-night-sky.jpg';
+import moon from '../images/moon.svg';
+import clockSound from '../sounds/clock-strikes-twelve.mp3';
 
 class CanvasClockComponent extends Component {
 
     state = {
-        showBedTimeInput: false
+        showBedTimeInput: false,
+        startBedTimeHour: 1,
+        startBedTimeMinute: 0,
+        startBedTimeAmPm: 1,
+        endBedTimeHour: 1,
+        endBedTimeMinute: 0,
+        endBedTimeAmPm: 0,
+        splitBedAndWakeTime: true
     }
 
     componentDidMount() {
@@ -19,6 +28,11 @@ class CanvasClockComponent extends Component {
         this.img.onload = () => {
             this.initCanvas();
         };
+        this.clockSound = new Audio(clockSound);
+    }
+
+    playBedTimeAudio() {
+        this.clockSound.play();
     }
 
     initCanvas() {
@@ -28,6 +42,14 @@ class CanvasClockComponent extends Component {
         setInterval(this.drawClock.bind(this), 1000);
 
         window.addEventListener('resize', this.drawClock.bind(this), false);
+    }
+
+    drawClock() {
+        this.setCanvasDimensions();
+        this.drawFace();
+        this.drawBedTime();
+        this.drawNumbers();
+        this.drawTime();
     }
 
     setCanvasDimensions() {
@@ -105,21 +127,21 @@ class CanvasClockComponent extends Component {
         ctx.fill();
 
         var now = new Date();
-        var hour = now.getHours();
-        var minute = now.getMinutes();
-        var second = now.getSeconds();
+        this.hour = now.getHours();
+        this.minute = now.getMinutes();
+        this.second = now.getSeconds();
         //hour
-        hour = hour % 12;
+        var hour = this.hour % 12;
         hour = (hour * Math.PI / 6) +
-            (minute * Math.PI / (6 * 60)) +
-            (second * Math.PI / (360 * 60));
+            (this.minute * Math.PI / (6 * 60)) +
+            (this.second * Math.PI / (360 * 60));
 
         this.drawHand(ctx, hour, radius * 0.5, radius * 0.07);
         //minute
-        minute = (minute * Math.PI / 30) + (second * Math.PI / (30 * 60));
+        var minute = (this.minute * Math.PI / 30) + (this.second * Math.PI / (30 * 60));
         this.drawHand(ctx, minute, radius * 0.8, radius * 0.07);
         // second
-        second = (second * Math.PI / 30);
+        var second = (this.second * Math.PI / 30);
         this.drawHand(ctx, second, radius * 0.9, radius * 0.02);
     }
 
@@ -128,7 +150,6 @@ class CanvasClockComponent extends Component {
         ctx.lineWidth = width;
         ctx.lineCap = "round";
 
-        
         ctx.moveTo(0, 0);
         ctx.rotate(pos);
         ctx.lineTo(0, -length);
@@ -141,59 +162,69 @@ class CanvasClockComponent extends Component {
         var ctx = this.ctx;
         var radius = this.radius;
 
-        ctx.globalCompositeOperation = 'source-over';
-
-        // center circle
-        ctx.beginPath();
-        this.bedTimeButtonY = -radius * .5;
-        this.bedTimeButtonRadius = radius * 0.15;
-        ctx.arc(
-            0,                          // x
-            this.bedTimeButtonY,        // y
-            this.bedTimeButtonRadius,   // r
-            0,                          // sAngle
-            2 * Math.PI,                // eAngle
-            true
-        );
-        ctx.fillStyle = '#d4d485';
-        ctx.fill();
-
-        ctx.globalCompositeOperation = 'source-atop';
-
-        // center circle
-        ctx.beginPath();
-        this.bedTimeButtonY = -radius * .5;
-        this.bedTimeButtonRadius = radius * 0.15;
-        ctx.arc(
-            this.bedTimeButtonRadius / 2,                          // x
-            this.bedTimeButtonY,        // y
-            this.bedTimeButtonRadius,   // r
-            0,                          // sAngle
-            2 * Math.PI,                // eAngle
-            true
-        );
-        ctx.fillStyle = '#fff';
-        ctx.fill();
-
-        ctx.globalCompositeOperation = 'source-over';
-
         if (this.state.showBedTime) {
-            var startTime = this.state.startBedTimeHour - 3;
-            var finishTime = this.state.endBedTimeHour - 3;
+            var twentyFourHourStartTime = this.state.startBedTimeAmPm === 1 ? this.state.startBedTimeHour + 12 : this.state.startBedTimeHour;
+            if (this.hour === twentyFourHourStartTime) {
+                this.playBedTimeAudio();
+            }
+
+            const arcStartTime = 3;
+            var startBedTimeHour = this.state.startBedTimeHour;
+            var endBedTimeHour = this.state.endBedTimeHour;
+
+            // add more logic and tests
+            if (
+                this.state.startBedTimeAmPm === 1 &&
+                this.state.endBedTimeAmPm === 0 &&
+                this.hour < twentyFourHourStartTime) {
+                endBedTimeHour = 12;
+            }
+
+            var startTime = (startBedTimeHour + (this.state.startBedTimeMinute / 100)) - arcStartTime;
+            var finishTime = (endBedTimeHour + (this.state.endBedTimeMinute / 100)) - arcStartTime;
             var startAngle = (startTime * Math.PI / 6)
             var endAngle = (finishTime * Math.PI / 6)
+            if (startTime === finishTime) {
+                startAngle = 0;
+                endAngle = 2 * Math.PI;
+            }
+
+            ctx.save();
             ctx.beginPath();
             ctx.moveTo(0, 0);
             ctx.arc(0, 0, radius * 0.98, startAngle, endAngle);
             ctx.globalAlpha = 0.85;
             var pattern = ctx.createPattern(this.img, 'repeat');
             ctx.fillStyle = pattern;
+            ctx.translate(this.canvas.width, this.canvas.height);
             ctx.fill();
             ctx.globalAlpha = 1;
+            ctx.restore();
         }
+
+        this.drawMoon();
+    }
+
+    drawMoon() {
+        var ctx = this.ctx,
+        radius = this.radius;
+
+        this.bedTimeButtonY = -radius * .5;
+        this.bedTimeButtonRadius = radius * 0.15;
+
+        // https://www.svgrepo.com/vectors/Moon/2
+        ctx.beginPath();
+        ctx.drawImage(
+            this.refs.moon,                                     // img
+            0 - this.bedTimeButtonRadius,                       // x
+            this.bedTimeButtonY - this.bedTimeButtonRadius,     // y
+            this.bedTimeButtonRadius * 2,                       // width    
+            this.bedTimeButtonRadius * 2                        // height
+        );
     }
 
     showBedTime() {
+        this.setFullScreen();
         this.setState({ showBedTime: true, showBedTimeInput: false });
     }
 
@@ -201,16 +232,7 @@ class CanvasClockComponent extends Component {
         this.setState({ showBedTime: false, showBedTimeInput: false });
     }
 
-    drawClock() {
-        this.setCanvasDimensions();
-        this.drawFace();
-        this.drawBedTime();
-        this.drawNumbers();
-        this.drawTime();
-    }
-
     canvasClicked({ clientX, clientY }) {
-
         var rect = this.canvas.getBoundingClientRect();
         var x = clientX - rect.left;
         var y = clientY - rect.top - (this.originalRadius - this.radius);
@@ -226,24 +248,41 @@ class CanvasClockComponent extends Component {
         return this.pointInCircle(x, y, bedTimeButtonX, Math.abs(this.bedTimeButtonY), this.bedTimeButtonRadius);
     }
 
+    setFullScreen() {
+        if(this.canvas.webkitRequestFullScreen) {
+            this.canvas.webkitRequestFullScreen();
+        }
+        else {
+            this.canvas.mozRequestFullScreen();
+        }   
+    }
+
     pointInCircle(x, y, cx, cy, radius) {
         return (((x - cx) * (x - cx)) + ((y - cy) * (y - cy))) <= (radius * radius);
     }
 
     bedTimeHourStartChanged(e) {
-        this.setState({ startBedTimeHour: e.target.value });
+        this.setState({ startBedTimeHour: parseInt(e.target.value) });
+    }
+
+    bedTimeMinuteStartChanged(e) {
+        this.setState({ startBedTimeMinute: parseInt(e.target.value) });
     }
 
     bedTimeAmPmStartChanged(e) {
-        this.setState({ startBedTimeAmPm: e.target.value });
+        this.setState({ startBedTimeAmPm: parseInt(e.target.value) });
     }
 
     bedTimeHourEndChanged(e) {
-        this.setState({ endBedTimeHour: e.target.value });
+        this.setState({ endBedTimeHour: parseInt(e.target.value) });
+    }
+
+    bedTimeMinuteEndChanged(e) {
+        this.setState({ endBedTimeMinute: parseInt(e.target.value) });
     }
 
     bedTimeAmPmEndChanged(e) {
-        this.setState({ endBedTimeAmPm: e.target.value });
+        this.setState({ endBedTimeAmPm: parseInt(e.target.value) });
     }
 
     closeBedTimeInput() {
@@ -285,22 +324,20 @@ class CanvasClockComponent extends Component {
                         width: 100%;
                         left: 0;
                         height: 100%;
-                    }
-                    
-                    .bedTimeInputPopup .box {
+                      }
+                      
+                      .bedTimeInputPopup .popup-container {
                         background: #292c35;
                         width: 100%;
                         margin: 0 auto;
-                        font-size: calc(3vw + 3vh);
                         height: 100%;
                         display: flex;
                         justify-content: space-around;
                         align-items: center;
                         flex-direction: column;
-                        padding: 0;
-                    }
-                    
-                    .bedTimeInputPopup .box > div {
+                      }
+                      
+                      .bedTimeInputPopup .popup-container > div {
                         height: 33%;
                         border-bottom: 1px solid #a0a0a0;
                         color: #fff;
@@ -308,9 +345,10 @@ class CanvasClockComponent extends Component {
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                    }
-                    
-                    .bedTimeInputPopup .box > div .col {
+                        box-sizing: content-box;
+                      }
+                      
+                      .bedTimeInputPopup .popup-container > div .col {
                         width: 50%;
                         height: 100%;
                         display: flex;
@@ -318,44 +356,44 @@ class CanvasClockComponent extends Component {
                         justify-content: flex-end;
                         padding: 3%;
                         box-sizing: border-box;
-                    }
+                      }
 
-                    .bedTimeInputPopup .box > div .col label{
+                      .bedTimeInputPopup .popup-container > div .col label {
                         font-size: calc(3vw + 3vh);
-                        font-weight: normal;
-                        font-family: Arial;
-                    }
-                    
-                    .bedTimeInputPopup .box > div .col:nth-child(2) {
+                        margin: 0;
+                        font: inherit;
+                      }
+                      
+                      .bedTimeInputPopup .popup-container > div .col:nth-child(2) {
                         background: #586567;
                         justify-content: flex-start;
-                    }
-                    
-                    .bedTimeInputPopup .box > div:nth-child(3) {
+                      }
+                      
+                      .bedTimeInputPopup .popup-container > div:nth-child(3) {
                         flex-direction: column-reverse;
-                    }
-                    
-                    .bedTimeInputPopup .box > div:nth-child(3) .col {
+                      }
+                      
+                      .bedTimeInputPopup .popup-container > div:nth-child(3) .col {
                         flex-direction: column-reverse;
                         width: 100%;
                         justify-content: center;
                         padding: 0;
-                    }
-                    
-                    .bedTimeInputPopup .box > div:nth-child(3) button {
+                      }
+                      
+                      .bedTimeInputPopup .popup-container > div:nth-child(3) button {
                         width: 100%;
                         height: 100%;
                         background: transparent;
                         border: none;
                         font-size: calc(3vw + 3vh);
                         color: #fff;
-                        padding: 0;
-                        border-radius: 0px;
-                    }
+                        box-shadow: none;
+                        font: inherit;
+                      }
                       
                 `}} />
                 <div className="bedTimeInputPopup" style={this.state.showBedTimeInput ? {} : { display: 'none' }}>
-                    <div className="box">
+                    <div className="popup-container">
                         <div>
                             <div className="col">
                                 <label>Bed Time</label>
@@ -375,9 +413,15 @@ class CanvasClockComponent extends Component {
                                     <option value="11">11</option>
                                     <option value="12">12</option>
                                 </select>
-                                <select onSelect={this.bedTimeAmPmStartChanged.bind(this)} >
+                                <select onChange={this.bedTimeMinuteStartChanged.bind(this)} >
+                                    <option value="0">00</option>
+                                    <option value="25">15</option>
+                                    <option value="50">30</option>
+                                    <option value="75">45</option>
+                                </select>
+                                <select defaultValue="1" onChange={this.bedTimeAmPmStartChanged.bind(this)} >
                                     <option value="0">AM</option>
-                                    <option value="1" selected="selected">PM</option>
+                                    <option value="1">PM</option>
                                 </select>
                             </div>
                         </div>
@@ -400,8 +444,14 @@ class CanvasClockComponent extends Component {
                                     <option value="11">11</option>
                                     <option value="12">12</option>
                                 </select>
-                                <select onSelect={this.bedTimeAmPmEndChanged.bind(this)} >
-                                    <option value="0" selected="selected">AM</option>
+                                <select onChange={this.bedTimeMinuteEndChanged.bind(this)} >
+                                    <option value="0">00</option>
+                                    <option value="25">15</option>
+                                    <option value="50">30</option>
+                                    <option value="75">45</option>
+                                </select>
+                                <select defaultValue="0" onChange={this.bedTimeAmPmEndChanged.bind(this)} >
+                                    <option value="0">AM</option>
                                     <option value="1">PM</option>
                                 </select>
                             </div>
@@ -416,7 +466,8 @@ class CanvasClockComponent extends Component {
                         </div>
                     </div>
                 </div>
-                <canvas ref="canvas" id="myc" width={300} height={300} />
+                <img src={moon} ref="moon" width={100} height={100} alt="moon" style={{display: 'none'}} />
+                <canvas ref="canvas" width={300} height={300} />
             </div>
         );
     }
