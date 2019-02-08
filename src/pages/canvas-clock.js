@@ -224,7 +224,6 @@ class CanvasClockComponent extends Component {
     }
 
     showBedTime() {
-        this.setFullScreen();
         this.setState({ showBedTime: true, showBedTimeInput: false });
     }
 
@@ -246,15 +245,6 @@ class CanvasClockComponent extends Component {
     isBedTimeClicked(x, y) {
         var bedTimeButtonX = this.canvas.width / 2;
         return this.pointInCircle(x, y, bedTimeButtonX, Math.abs(this.bedTimeButtonY), this.bedTimeButtonRadius);
-    }
-
-    setFullScreen() {
-        if(this.canvas.webkitRequestFullScreen) {
-            this.canvas.webkitRequestFullScreen();
-        }
-        else {
-            this.canvas.mozRequestFullScreen();
-        }   
     }
 
     pointInCircle(x, y, cx, cy, radius) {
