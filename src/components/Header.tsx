@@ -13,7 +13,7 @@ export const Header = ({ timeout, onOpenArticle }: Props) => {
             <div className="content">
                 <div className="inner">
                     <h1>Aaron McKinney</h1>
-                    <p>Husband, Father, Friend, Learner, Gamer and Lover of Burritos</p>
+                    <p>Husband, Father, Friend, Learner, Pizza Chef and Lover of Burritos</p>
                 </div>
             </div>
             <nav>
@@ -21,7 +21,6 @@ export const Header = ({ timeout, onOpenArticle }: Props) => {
                     <li><a href="javascript:;" onClick={() => { onOpenArticle('intro') }}>Intro</a></li>
                     <li><a href="javascript:;" onClick={() => { onOpenArticle('resume') }}>Resume</a></li>
                     <li><a href="javascript:;" onClick={() => { onOpenArticle('work') }}>Portfolio</a></li>
-                    {/* <li><a href="javascript:;" onClick={() => { onOpenArticle('about') }}>About</a></li> */}
                     <li><a href="javascript:;" onClick={() => { onOpenArticle('contact') }}>Contact</a></li>
                 </ul>
             </nav>

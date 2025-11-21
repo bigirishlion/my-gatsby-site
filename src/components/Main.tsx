@@ -39,7 +39,7 @@ export const Main = ({ onCloseArticle, article, timeout, articleTimeout }: Props
                     <img src={family} alt="" />
                 </span>
                 <p>
-                    I'm a husband and dad in an amazing family of five. My home is always full of noise, laughter, and the occasional sibling negotiation, and I honestly would not trade it for anything. My faith is a big part of who I am because it keeps me steady, reminds me what matters, and helps me show up the way I want to for the people I love. Family time is my anchor and the place where everything makes the most sense.
+                    I'm a husband and dad in an amazing family of six. My home is always full of noise, laughter, and the occasional sibling negotiation, and I honestly would not trade it for anything. My faith is a big part of who I am because it keeps me steady, reminds me what matters, and helps me show up the way I want to for the people I love. Family time is my anchor and the place where everything makes the most sense.
                 </p>
                 {close}
             </article>
