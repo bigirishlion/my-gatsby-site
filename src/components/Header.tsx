@@ -13,7 +13,7 @@ export const Header = ({ timeout, onOpenArticle }: Props) => {
             <div className="content">
                 <div className="inner">
                     <h1>Aaron McKinney</h1>
-                    <p>Husband, Father, Friend, Learner, Pizza Chef and Lover of Burritos</p>
+                    <p>Husband & Father · Crypto Founder · Software Engineer · Pizza Chef</p>
                 </div>
             </div>
             <nav>

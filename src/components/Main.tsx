@@ -64,6 +64,11 @@ export const Main = ({ onCloseArticle, article, timeout, articleTimeout }: Props
                 <p>
                     I'm a husband and dad in an amazing family of six. My home is always full of noise, laughter, and the occasional sibling negotiation, and I honestly would not trade it for anything. My faith is a big part of who I am because it keeps me steady, reminds me what matters, and helps me show up the way I want to for the people I love. Family time is my anchor and the place where everything makes the most sense.
                 </p>
+                <p>
+                    On the professional side, I’m a software engineer and crypto founder who enjoys building things that last. I’ve spent many years working on software in different environments, learning how systems grow, where they break, and what it takes to keep them reliable over time. Starting and running a company has taught me a lot about ownership, patience, and responsibility, and it’s shaped how I think about work and problem solving.
+                </p>
+                <p>I care deeply about doing good work, staying curious, and continuing to learn, especially in a field that never stands still.</p>
+                <p>Outside of work, I like making pizza, exploring ideas, and spending time with my family. Life feels best when it’s simple, honest, and shared with the people who matter most.</p>
                 {close}
             </article>
 
