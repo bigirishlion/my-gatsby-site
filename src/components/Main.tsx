@@ -167,7 +167,7 @@ export const Main = ({ onCloseArticle, article, timeout, articleTimeout }: Props
                                 <div className="resume-item-header">
                                     <h3>Chief Technology Officer</h3>
                                 </div>
-                                <p className="resume-company">Korolabs LLC, <span className="resume-date">March 2021 - Present</span></p>
+                                <p className="resume-company">Kora Labs LLC, <span className="resume-date">March 2021 - Present</span></p>
                                 <ul>
                                     <li>Lead engineering and architecture for blockchain-powered products in the Cardano ecosystem.</li>
                                     <li>Launched ADA Handles, a naming protocol with over 250,000 NFTs issued, and built personalization tools for user customization.</li>
