@@ -15,7 +15,7 @@ const Resume: React.FC = () => {
         const opt = {
             margin: 10,
             filename: 'resume.pdf',
-            image: { type: 'png' as const, quality: 0.98 },
+            image: { type: 'jpeg' as const, quality: 0.98 },
             html2canvas: { scale: 2, logging: false },
             jsPDF: { orientation: 'portrait' as const, unit: 'mm', format: 'a4' },
         }
@@ -143,6 +143,14 @@ const Resume: React.FC = () => {
                     Print
                 </button>
             </div>
+
+            <button
+                className=""
+                onClick={handleDownloadPDF}
+                title="Download your resume as PDF"
+            >
+                Download PDF
+            </button>
         </div>
     )
 }
